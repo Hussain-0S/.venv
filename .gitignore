@@ -1,0 +1,25 @@
+# Environment
+.env
+
+# Python environment
+.venv/
+pyvenv.cfg
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Unrelated testing project
+Testing/
+
+# Local database
+test.db
+
+# Logs
+*.log
+
+# Large model files
+*.pt
