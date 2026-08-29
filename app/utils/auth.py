@@ -2,10 +2,12 @@ from jose import jwt, JWTError
 from datetime import timedelta, datetime
 from fastapi import HTTPException
 import os
+from dotenv import load_dotenv
 
+load_dotenv()  #  load all the variables found in .env as environment variables.
 
-Token_key = "secret"
-Algorithm = "HS256"
+Token_key = os.getenv("TOKEN_KEY")   # Used to be just SECRET , now changed for security
+Algorithm = os.getenv("ALGORITHM")
 
 def create_token(data : dict):
     to_encode = data.copy()
