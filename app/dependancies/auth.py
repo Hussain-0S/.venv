@@ -5,7 +5,6 @@ from app.models import User
 from sqlalchemy.orm import Session
 
 def get_current_user(authentication : str = Header(None), db : Session = Depends(get_db)):
-    print(authentication)
     if not authentication:
         raise HTTPException(status_code=401, detail="Token missing")
 
