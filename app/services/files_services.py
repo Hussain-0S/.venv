@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.models import File
 import os
 from pathlib import Path
+import uuid
 
 chunk_size = 1024 * 1024   #1 MB
 MAX_SIZE = 10 * 1024 * 1024 #10 MB
@@ -19,15 +20,17 @@ allowed_types = [
 
 def uploadFile(file : UploadFile , display_name : str,  owner_id : int , db: Session):
 
-    physical_filename = Path(file.filename).name
-    file_path = f'app/uploads/{physical_filename}'
+
+    file_extension = Path(file.filename).suffix.lower()
+    physical_filename = f"{uuid.uuid4().hex}{file_extension}"
+    file_path = Path("app/uploads") / physical_filename
+    file_created = False
     total_size = 0
     
 
     # Validate File Type
-    file_extension = os.path.splitext(file.filename)[1].lower()
 
-    if (file_extension not in allowed_Extensions) and (file.content_type not in allowed_types):
+    if (file_extension not in allowed_Extensions) or (file.content_type not in allowed_types):
         raise HTTPException(
             status_code=409,
             detail= "File Type not allowed"
@@ -37,10 +40,11 @@ def uploadFile(file : UploadFile , display_name : str,  owner_id : int , db: Ses
     try :
         with open(
             file_path,
-            'wb'
+            'xb'
         ) as buffer :
 
             print(MAX_SIZE)
+            file_created = True
 
             while chunk := file.file.read(chunk_size):
 
@@ -55,7 +59,7 @@ def uploadFile(file : UploadFile , display_name : str,  owner_id : int , db: Ses
 
                 buffer.write(chunk)
 
-            db_file = File(file_name = display_name, file_path = file_path, owner_id = owner_id)
+            db_file = File(file_name = display_name, file_path = str(file_path), owner_id = owner_id)
 
             db.add(db_file)
             db.commit()
@@ -66,8 +70,8 @@ def uploadFile(file : UploadFile , display_name : str,  owner_id : int , db: Ses
     except Exception:
         db.rollback()
 
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        if file_created and file_path.exists():
+            file_path.unlink()
 
         raise
 

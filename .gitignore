@@ -23,3 +23,6 @@ test.db
 
 # Large model files
 *.pt
+
+# Claude capability test 
+*Claude_frontend/

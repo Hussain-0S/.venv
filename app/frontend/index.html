@@ -43,6 +43,9 @@
         <input id="item-input" placeholder="Add Item"> <button onclick="createItem()" style="background-color: brown;">Add</button>
         <p></p>
         <input id="Del-input" placeholder="ID required"> <button onclick="DelItem()" style="background-color: brown;">Remove</button>
+        
+        
+        <p><input id="updateID" placeholder="Item ID"> <button></button></p>
 
     </div>
 
@@ -73,6 +76,12 @@ async function register() {
             password: document.getElementById("register-password").value
         })
     })
+
+    if (!response.ok) {
+        error = await response.json()
+        alert(error.detail)
+        return
+    }
 
     showApp()
     const data = await response.json()
@@ -117,7 +126,7 @@ async function login() {
 
 
     console.log(data)
-    console.log("token is : " + token)
+    console.log("token is : " + data.access_token)
 
     document.getElementById("output").innerText = JSON.stringify(data, null, 2)
 }

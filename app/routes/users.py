@@ -42,7 +42,9 @@ def register(user : UserCreate, db: Session = Depends(get_db)): # Create a new u
     db.commit()
     db.refresh(db_user)
 
-    return (db_user)
+    user_token = create_token({"subject": db_user.email})
+
+    return {"access_token" : user_token}
 
 
 @router.post("/login")
@@ -59,9 +61,9 @@ def login(user : UserLogin, db : Session = Depends(get_db)):
 
 
 @router.put("/users/{user_id}")
-def UpdateUser (updatedUser : UserCreate, user_id : int, db : Session = Depends(get_db)): # Update existing user
+def UpdateUser (updatedUser : UserCreate,current_user = Depends(get_current_user) , db : Session = Depends(get_db)): # Update existing user
 
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == current_user.id).first()
 
     if not user: raise HTTPException(satatus_code=404 , detail = "User not found")
 
@@ -74,8 +76,8 @@ def UpdateUser (updatedUser : UserCreate, user_id : int, db : Session = Depends(
     return user
 
 @router.delete("/users/{user_id}")
-def DeleteUser(user_id : int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+def DeleteUser(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == current_user.id).first()
 
     if not user : raise HTTPException(status_code= 404, detail = "User not found")
 
