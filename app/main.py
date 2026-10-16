@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 load_dotenv()
 
@@ -8,6 +10,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import users,items, uploads
 
 app = FastAPI()
+
+@app.get("/", include_in_schema=False)
+def frontend():
+    return FileResponse(
+        Path(__file__).parent / "frontend" / "index.html"
+    )
+
 
 allowed_origins = [
     origin.strip()
